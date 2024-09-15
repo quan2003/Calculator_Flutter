@@ -43,6 +43,25 @@ class _CalculatorState extends State<Calculator> {
         _currentNumber = "";
         _operation = "";
         _result = 0.0;
+      } else if (buttonText == "<--") {
+        if (_currentNumber.isNotEmpty) {
+          _currentNumber = _currentNumber.substring(0, _currentNumber.length - 1);
+          if (_currentNumber.isEmpty) {
+            _currentNumber = "0";
+          }
+          _output = _currentNumber;
+        } else if (_equation.isNotEmpty) {
+          // Xóa ký tự cuối cùng trong _equation
+          _equation = _equation.trimRight();
+          if (_equation.endsWith("+") || _equation.endsWith("-") || _equation.endsWith("*") || _equation.endsWith("/")) {
+            _equation = _equation.substring(0, _equation.length - 1).trimRight();
+          }
+          if (_equation.isNotEmpty) {
+            _currentNumber = _equation.split(' ').last;
+          } else {
+            _currentNumber = "0";
+          }
+        }
       } else if (buttonText == "+" || buttonText == "-" || buttonText == "/" || buttonText == "*") {
         if (_currentNumber.isNotEmpty) {
           if (_equation.isNotEmpty && !_equation.endsWith(" ")) {
@@ -147,19 +166,24 @@ class _CalculatorState extends State<Calculator> {
       ),
     );
   }
+
   List<Widget> _buildCalculatorButtons() {
     List<List<String>> buttons = [
       ["7", "8", "9", "/"],
       ["4", "5", "6", "*"],
       ["1", "2", "3", "-"],
       [".", "0", "00", "+"],
-      ["C", "="]
+      ["C", "<--", "="] // Thay đổi nút "Backspace" thành "<--"
     ];
     return buttons.map((List<String> row) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: row.map((String buttonText) {
-          return buildButton(buttonText);
+          if (buttonText == "<--") {
+            return buildIconButton();
+          } else {
+            return buildButton(buttonText);
+          }
         }).toList(),
       );
     }).toList();
@@ -180,6 +204,27 @@ class _CalculatorState extends State<Calculator> {
         child: Text(
           buttonText,
           style: const TextStyle(fontSize: 24.0, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Widget buildIconButton() {
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      child: ElevatedButton(
+        onPressed: () => buttonPressed("<--"),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.all(20.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20.0),
+          ),
+          backgroundColor: Colors.orange, // Màu cho nút Backspace
+        ),
+        child: Icon(
+          Icons.arrow_back, // Biểu tượng mũi tên
+          size: 24.0,
+          color: Colors.white,
         ),
       ),
     );
